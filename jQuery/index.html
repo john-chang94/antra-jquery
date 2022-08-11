@@ -16,10 +16,12 @@
     <button class="continue">continue</button>
     <button class="continue">continue</button>
     <p id="banner-message">hidden</p>
-    <div id="button-container">
+    <div id="button-container" class="one two three">
         <button>show</button>
     </div>
-
+    <br />
+    <h2 style="min-height: 1400px">scroll down</h2>
+    <button id="scroll-up">scroll to top</button>
 
     <script>
         function $$(selector) {
@@ -49,13 +51,41 @@
         }
         $$().__proto__.ajax = async function (body) {
             try {
-                const res = await fetch(body.url);
+                const res = await fetch(body.url, {
+                    method: body.type || "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(body.data) || null
+                });
                 res.json().then(data => body.success(data));
             } catch (err) {
                 console.log(err);
             }
         }
 
+        // Four additional functions
+        $$().__proto__.addClass = function (classes) {
+            this.elements.forEach(element => {
+                element.className += classes;
+            })
+        }
+        $$().__proto__.click = function (callback) {
+            this.elements.forEach(element => {
+                element.addEventListener("click", callback);
+            })
+        }
+        $$().__proto__.removeClass = function (classes) {
+            const classList = classes.split(" ");
+            this.elements.forEach(element => {
+                classList.map((classItem) => element.classList.remove(classItem))
+            })
+        }
+        $$().__proto__.scrollTop = function () {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        // RUN
         console.log($$('button.continue').html === $$('button.continue').html)
         
         $$('button.continue').html('next step');
@@ -68,17 +98,26 @@
 
         $$.ajax({
             url: "https://jsonplaceholder.typicode.com/todos/1",
+            // type: "DELETE",
+            // data: { completed: false },
             success: function (result) {
                 console.log("$.ajax", result);
             }
         })
 
-        // $.ajax({
-            // url: "https://jsonplaceholder.typicode.com/todos/1",
-            // success: function (result) {
-            //     console.log("$.ajax", result);
-            // }
-        // })
+        // Four additional features
+        $$("#button-container button").addClass("button red");
+
+        $$("#button-container button").click(() => {
+            alert("click listener added");
+        })
+
+        $$("#button-container").removeClass("one");
+
+        $$("#scroll-up").click(() => {
+            $$("body").scrollTop();
+        })
+        
     </script>
 </body>
 
